@@ -1,0 +1,48 @@
+
+
+Velkommen til pris robot 3000!!
+
+Her kan du få tjekket alle dine varer mod bog og ide's vare katalog.
+
+For at gøre brug af programmet skal der tilføjes en excel fil i mappen "Filer"
+
+Hvis denne mappe ikke findes skal du oprette den selv.
+
+
+Når dette er gjort er du klar til at køre programmet.
+
+Klik på filen "price-bot.exe" i mappen "price-bot".
+
+Der åbner nu en sort boks op hvor der vil stå noget tekst som guider dig igennem næste step.
+(Alt du skal gøre er at skrive ja og så klarer programmet resten herfra).
+
+Når du har skrevet ja skal du klikke på "enter knappen" også kendt som den knækkede pil.
+
+Herefter starter programmet dette kan ses ved at den skriver sætningen "tjekker efter excel fil".
+
+Og hvis den finder en excel fil der virker vil du se denne text "Tjekker varenummer: (indsæt vilkårligt varenummer her)".
+
+Dette vil den stå og gøre længe og der vil komme mange beskeder, nu er tidspunktet hvor du kan lade den være i fred. og gøre hvad du ellers skal.
+
+
+Når programmet har kørt alle varene igennem vil du se denne række af beskeder (se bort fra tallene da de nok ikke er præcis de samme).
+
+The directory was created successfully at 12-06-2025 06:19:50.
+Textfile Has been created In folder called File
+Start tidspunkt: 12-06-2025 06:19:50
+Slut tidspunkt: 12-06-2025 06:19:50
+Hvor lang tid tog det: 00:00:00.0244746
+Bye
+
+Der vil nu være blevet oprettet en fil i mappen "Forkerte priser" som vil indeholde en fil der hedder "Forkerte priser.txt".
+
+I denne fil kan du finde alle de varer som programmet har fundet hvor der er en forskel i prisen. 
+
+Først kommer de varer hvor bog og ide har den højeste pris.
+
+Derefter kommer varerene hvor din butik har den højeste pris.
+
+Da der kan forekomme tilbud i disse priser, er det altid en god ide at dobbelt tjekke prisen gennem det link der er sammen med varens oplysninger.
+Dette link tager dig direkte til den vare på bog og ide's hjemmeside.
+
+God fornøjelse, håber i får nogle skejser ud af det.

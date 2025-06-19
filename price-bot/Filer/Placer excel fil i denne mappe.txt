@@ -1,0 +1,1 @@
+Excel filen skal altid placeres i den mappe hvor denne fil optræder
