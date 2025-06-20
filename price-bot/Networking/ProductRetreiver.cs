@@ -57,7 +57,7 @@ public class ProductRetreiver
             hello++;
         }
 
-        return [.. incorrectProducts.OrderBy(p => p.GrowthType)];
+        return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.DifferentialPrice)];
     }
 
     internal async Task<Product?> GetProductFromAPI(AlstroemsProduct product)

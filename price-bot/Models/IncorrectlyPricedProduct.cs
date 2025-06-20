@@ -22,7 +22,4 @@ public class IncorrectlyPricedProduct
     [Column("Link")]
     [Formula]
     public string HyperLink { get => $"HYPERLINK(\"{Url}\")"; }
-
-    [Formula]
-    public static string ColorChange { get => "AVARAGE(=Row())"; }
 }
