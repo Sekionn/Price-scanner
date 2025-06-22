@@ -8,7 +8,7 @@ public class FileReader
     public static List<AlstroemsProduct> ReadExcel()
     {
         Console.WriteLine("\nTjekker efter excel fil");
-        List<AlstroemsCSV> products = [];
+        List<AlstroemsExcel> products = [];
         try
         {
             var files = Directory.GetFiles(Path.GetFullPath(@"Filer"), "*.xlsx");
@@ -17,7 +17,7 @@ public class FileReader
             {
                 try
                 {
-                    var excelFile = new ExcelMapper(file).Fetch<AlstroemsCSV>().ToList();
+                    var excelFile = new ExcelMapper(file).Fetch<AlstroemsExcel>().ToList();
                     if (excelFile != null)
                     {
                         products.AddRange(excelFile);

@@ -68,7 +68,6 @@ internal class FileWriter
             CreateCell(CurrentRow, 6, product.ProductName.ToString(), borderedCellStyle);
             CreateCell(CurrentRow, 7, "Klik her", borderedCellStyle, product.HyperLink);
             RowIndex++;
-
         }
 
         int lastColumNum = Sheet.GetRow(0).LastCellNum;
@@ -86,7 +85,7 @@ internal class FileWriter
         return true;
     }
 
-    private void CreateCell(IRow currentRow, int cellIndex, string value, HSSFCellStyle style, string? hyperlink = null)
+    private static void CreateCell(IRow currentRow, int cellIndex, string value, HSSFCellStyle style, string? hyperlink = null)
     {
         ICell cell = currentRow.CreateCell(cellIndex);
         cell.SetCellValue(value);

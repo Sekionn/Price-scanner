@@ -1,7 +1,7 @@
 ﻿using price_bot.Models;
 
 namespace price_bot.FileReaders.FileModels;
-public class AlstroemsCSV
+public class AlstroemsExcel
 {
     public required string Nummer { get; set; }
     public required string Beskrivelse { get; set; }
