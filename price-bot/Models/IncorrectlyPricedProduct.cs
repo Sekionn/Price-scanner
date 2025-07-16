@@ -17,9 +17,6 @@ public class IncorrectlyPricedProduct
     public required string ProductName { get; init; }
     
     public required GrowthType GrowthType { get; init; }
-    [Ignore]
-    public required string Url { get; init; }
     [Column("Link")]
-    [Formula]
-    public string HyperLink { get => $"HYPERLINK(\"{Url}\")"; }
+    public required string Url { get; init; }
 }

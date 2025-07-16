@@ -1,5 +1,6 @@
 ﻿using price_bot.Enums;
 using price_bot.FileReaders;
+using price_bot.Logging;
 using price_bot.Models;
 using System.Text.Json;
 
@@ -20,11 +21,13 @@ public class ProductRetreiver
             Console.WriteLine("Der var ingen varer i excel filen");
             return incorrectProducts;
         }
+        var logger = new LoggingService<ProductRetreiver>();
 
-        int hello = 0;
+        int productNumberCount = 0;
         foreach (var product in products)
         {
             Console.WriteLine($"Tjekker varenummer: {product.ProductNumber}");
+            logger.CreateLog($"Checked productnumber count {productNumberCount}");
             var websiteProduct = await GetProductFromAPI(product);
 
             if (websiteProduct != null)
@@ -54,7 +57,7 @@ public class ProductRetreiver
             Console.WriteLine($"Sleeping");
             Thread.Sleep(1000);
             Console.WriteLine($"Awake");
-            hello++;
+            productNumberCount++;
         }
 
         return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.DifferentialPrice)];

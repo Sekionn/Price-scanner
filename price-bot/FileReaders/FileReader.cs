@@ -1,5 +1,6 @@
 ﻿using Ganss.Excel;
 using price_bot.FileReaders.FileModels;
+using price_bot.Logging;
 using price_bot.Models;
 
 namespace price_bot.FileReaders;
@@ -23,19 +24,21 @@ public class FileReader
                         products.AddRange(excelFile);
                     }
                 }
-                catch
+                catch(Exception e)
                 {
-                    Console.WriteLine("No files found in the files folder");
-                    Console.WriteLine(file);
+                    var logger = new LoggingService<FileReader>();
+                    logger.CreateError(e.Message);
 
                     Console.ReadKey();
+                    throw;
                 }
             }
 
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            Console.WriteLine("No files found in the files folder");
+            var logger = new LoggingService<FileReader>();
+            logger.CreateError(e.Message);
 
             Console.ReadKey();
             throw;

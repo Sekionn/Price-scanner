@@ -1,9 +1,11 @@
 ﻿using price_bot.FileWriter;
+using price_bot.Logging;
 using price_bot.Networking;
 internal class Program
 {
     private static async Task Main(string[] args)
     {
+        var logger = new LoggingService<Program>();
         Console.WriteLine("Vil du gerne have tjekket bog og ide's priser?");
         Console.WriteLine("Skriv 'Ja' for at starte programmet");
 
@@ -63,8 +65,7 @@ internal class Program
                 var incorrectProducts = await productRetreiver.GetProductsWithIncorrectPrices();
 
                 DirectoryInfo di = Directory.CreateDirectory("Forkerte priser");
-                Console.WriteLine("The directory was created successfully at {0}.",
-                    Directory.GetCreationTime("Forkerte priser"));
+                logger.CreateLog($"The directory was created successfully at {Directory.GetCreationTime("Forkerte priser")}.");
 
                 FileWriter fileWriter = new();
                 await fileWriter.WriteTXTFile(incorrectProducts);
@@ -72,9 +73,9 @@ internal class Program
 
                 DateTime finishDate = DateTime.Now;
 
-                Console.WriteLine($"Start tidspunkt: {startDate}");
-                Console.WriteLine($"Slut tidspunkt: {finishDate}");
-                Console.WriteLine($"Hvor lang tid tog det: {finishDate - startDate}");
+                logger.CreateLog($"Start tidspunkt: {startDate}");
+                logger.CreateLog($"Slut tidspunkt: {finishDate}");
+                logger.CreateLog($"Hvor lang tid tog det: {finishDate - startDate}");
             }
         }
 
