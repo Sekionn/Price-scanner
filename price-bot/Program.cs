@@ -1,15 +1,38 @@
-﻿using price_bot.FileWriter;
+﻿using price_bot.Demo_feature;
+using price_bot.FileWriter;
 using price_bot.Logging;
 using price_bot.Networking;
 internal class Program
 {
     private static async Task Main(string[] args)
     {
-        var logger = new LoggingService<Program>();
-        Console.WriteLine("Vil du gerne have tjekket bog og ide's priser?");
-        Console.WriteLine("Skriv 'Ja' for at starte programmet");
+        var versionRetreiver = new VersionRetreiver();
+        var demoController = new DemoController();
 
-        string? command = Console.ReadLine();
+        if (versionRetreiver.IsDemoVersion())
+        {
+
+            if (!demoController.HasDemoStarted())
+            {
+                demoController.StartDemo();
+            }
+            
+        }
+
+        var logger = new LoggingService<Program>();
+        string? command = null;
+
+        if (!demoController.HasDemoFinished())
+        {
+            Console.WriteLine("Vil du gerne have tjekket bog og ide's priser?");
+            Console.WriteLine("Skriv 'Ja' for at starte programmet");
+
+            command = Console.ReadLine();
+        }
+        else
+        {
+            Console.WriteLine("Din proeveperiode er udloebet kontakt Sebastian for at koebe programmet");
+        }
 
         if (command != null)
         {
@@ -79,7 +102,7 @@ internal class Program
             }
         }
 
-        Console.WriteLine("Bye");
+        Console.WriteLine("Farvel");
         Console.ReadLine();
     }
 }
