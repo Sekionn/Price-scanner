@@ -41,6 +41,7 @@ public class ProductRetreiver
                         AlternatePrice = websiteProduct.price,
                         ProductName = product.ProductName,
                         ProductNumber = product.ProductNumber,
+                        Stock = product.Stock,
                         GrowthType = product.Price > websiteProduct.price ? GrowthType.CostsLess : GrowthType.CostsMore,
                         Url = websiteProduct.url
                     });

@@ -1,5 +1,6 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using NPOI.Util;
 using price_bot.Enums;
 using price_bot.Logging;
 using price_bot.Models;
@@ -20,6 +21,7 @@ internal class FileWriter
                     outputFile.WriteLine($"Butikkens pris er {product.CurrentPrice} DKK");
                     outputFile.WriteLine($"Bog og ide's pris er {product.AlternatePrice} DKK");
                     outputFile.WriteLine($"Differencen mellem priserne er {product.CurrentPrice - product.AlternatePrice} DKK");
+                    outputFile.WriteLine($"Varebeholdningen er: {product.Stock}");
                     outputFile.WriteLine($"Link til produktet for dobbelt tjek: {product.Url}");
                     outputFile.WriteLine($"-------------------------------------- Næste produkt ------------------------------------------------------");
                 }
@@ -54,19 +56,33 @@ internal class FileWriter
             borderedCellStyle.BorderRight = BorderStyle.Medium;
             borderedCellStyle.BorderBottom = BorderStyle.Medium;
             borderedCellStyle.VerticalAlignment = VerticalAlignment.Center;
+            borderedCellStyle.Alignment = HorizontalAlignment.Left;
+
+            HSSFCellStyle borderedCellStyleNumbers = (HSSFCellStyle)workbook.CreateCellStyle();
+            borderedCellStyleNumbers.BorderLeft = BorderStyle.Medium;
+            borderedCellStyleNumbers.BorderTop = BorderStyle.Medium;
+            borderedCellStyleNumbers.BorderRight = BorderStyle.Medium;
+            borderedCellStyleNumbers.BorderBottom = BorderStyle.Medium;
+            borderedCellStyleNumbers.VerticalAlignment = VerticalAlignment.Center;
+            borderedCellStyleNumbers.Alignment = HorizontalAlignment.Right;
 
             ISheet Sheet = workbook.CreateSheet("Forkerte priser");
             //Headere
             IRow HeaderRow = Sheet.CreateRow(0);
 
+            //Checkmark fælter
             CreateCell(HeaderRow, 0, "Pris tjekket", borderedCellStyle);
             CreateCell(HeaderRow, 1, "Skal blokeres", borderedCellStyle);
-            CreateCell(HeaderRow, 2, "Pris difference", borderedCellStyle);
-            CreateCell(HeaderRow, 3, "Bog og ide's pris", borderedCellStyle);
-            CreateCell(HeaderRow, 4, "Butikkens pris", borderedCellStyle);
-            CreateCell(HeaderRow, 5, "Varenummer", borderedCellStyle);
-            CreateCell(HeaderRow, 6, "Navn", borderedCellStyle);
-            CreateCell(HeaderRow, 7, "Link", borderedCellStyle);
+
+            //Informationer
+            CreateCell(HeaderRow, 2, "Total tab/vind", borderedCellStyle);
+            CreateCell(HeaderRow, 3, "Lagerbeholdning", borderedCellStyle);
+            CreateCell(HeaderRow, 4, "Pris difference", borderedCellStyle);
+            CreateCell(HeaderRow, 5, "Bog og ide's pris", borderedCellStyle);
+            CreateCell(HeaderRow, 6, "Butikkens pris", borderedCellStyle);
+            CreateCell(HeaderRow, 7, "Varenummer", borderedCellStyle);
+            CreateCell(HeaderRow, 8, "Navn", borderedCellStyle);
+            CreateCell(HeaderRow, 9, "Link", borderedCellStyle);
 
             //Index til rækkerne, da første række jo er titler
             int RowIndex = 1;
@@ -74,14 +90,20 @@ internal class FileWriter
             foreach (IncorrectlyPricedProduct product in products)
             {
                 IRow CurrentRow = Sheet.CreateRow(RowIndex);
+                //Checkmark fælter
                 CreateCell(CurrentRow, 0, "", borderedCellStyle);
                 CreateCell(CurrentRow, 1, "", borderedCellStyle);
-                CreateCell(CurrentRow, 2, product.DifferentialPrice.ToString(), borderedCellStyle);
-                CreateCell(CurrentRow, 3, product.AlternatePrice.ToString(), borderedCellStyle);
-                CreateCell(CurrentRow, 4, product.CurrentPrice.ToString(), borderedCellStyle);
-                CreateCell(CurrentRow, 5, product.ProductNumber.ToString(), borderedCellStyle);
-                CreateCell(CurrentRow, 6, product.ProductName, borderedCellStyle);
-                CreateCell(CurrentRow, 7, product.Url, borderedCellStyle);
+
+                //Informationer
+                CreateCell(CurrentRow, 2, ((product.Stock * product.DifferentialPrice) * -1).ToString("0.00"), borderedCellStyleNumbers);
+                CreateCell(CurrentRow, 3, product.Stock.ToString(), borderedCellStyleNumbers);
+                CreateCell(CurrentRow, 4, (product.DifferentialPrice * -1).ToString("0.00"), borderedCellStyleNumbers);
+                CreateCell(CurrentRow, 5, product.AlternatePrice.ToString("0.00"), borderedCellStyleNumbers);
+                CreateCell(CurrentRow, 6, product.CurrentPrice.ToString("0.00"), borderedCellStyleNumbers);
+
+                CreateCell(CurrentRow, 7, product.ProductNumber.ToString(), borderedCellStyle);
+                CreateCell(CurrentRow, 8, product.ProductName, borderedCellStyle);
+                CreateCell(CurrentRow, 9, product.Url, borderedCellStyle);
                 RowIndex++;
             }
 
