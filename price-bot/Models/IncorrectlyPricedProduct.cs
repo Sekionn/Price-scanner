@@ -15,7 +15,9 @@ public class IncorrectlyPricedProduct
     public required string ProductNumber { get; init; }
     [Column("Navn")]
     public required string ProductName { get; init; }
-    
+
+    [Column("Lagerbeholdning")]
+    public required int Stock { get; init; }
     public required GrowthType GrowthType { get; init; }
     [Column("Link")]
     public required string Url { get; init; }

@@ -22,7 +22,7 @@ internal class Program
         var logger = new LoggingService<Program>();
         string? command = null;
 
-        if (!demoController.HasDemoFinished())
+        if (!versionRetreiver.IsDemoVersion() || !demoController.HasDemoFinished())
         {
             Console.WriteLine("Vil du gerne have tjekket bog og ide's priser?");
             Console.WriteLine("Skriv 'Ja' for at starte programmet");
