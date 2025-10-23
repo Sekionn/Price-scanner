@@ -17,11 +17,9 @@ public class DemoController
         string line = sr.ReadLine();
 
         DateOnly startDate = DateOnly.Parse(line);
-        DateOnly endDate = startDate;
-        endDate.AddDays(14);
-        DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
+        DateOnly endDate = startDate.AddDays(183);
 
-        var hello = currentDate.CompareTo(endDate);
+        DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
 
         return currentDate.CompareTo(endDate) > 0;
     }
@@ -40,7 +38,7 @@ public class DemoController
                 w.Write($"{date}");
             }
 
-            Console.WriteLine("Din proeveperiode på 14 dage er nu begyndt, held og lykke");
+            Console.WriteLine("Din proeveperiode på 6 maaneder er nu begyndt, held og lykke");
         }
         catch (Exception e)
         {
