@@ -6,4 +6,5 @@ public class AlstroemsProduct
     public required double Price { get; init; }
     public required string ProductNumber { get; init; }
     public required int Stock { get; init; }
+    public string? EAN { get; init; }
 }

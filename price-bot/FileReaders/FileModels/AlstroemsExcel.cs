@@ -7,6 +7,7 @@ public class AlstroemsExcel
     public required string Beskrivelse { get; set; }
     public required string Enhedspris { get; set; }
     public required int Lager { get; set; }
+    public string Labelstregkode { get; set; }
 
     public AlstroemsProduct Convert()
     {
@@ -15,7 +16,8 @@ public class AlstroemsExcel
             ProductNumber = Nummer,
             ProductName = Beskrivelse,
             Price = Double.Parse(String.Join("", Enhedspris.Split(',')).Replace('.', ',')),
-            Stock = Lager
+            Stock = Lager,
+            EAN = Labelstregkode
         };
     }
 }

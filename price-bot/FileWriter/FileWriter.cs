@@ -49,22 +49,7 @@ internal class FileWriter
             var path = Path.Combine(@"Forkerte priser\Forkerte priser.xls");
 
             HSSFWorkbook workbook = new HSSFWorkbook();
-
-            HSSFCellStyle borderedCellStyle = (HSSFCellStyle)workbook.CreateCellStyle();
-            borderedCellStyle.BorderLeft = BorderStyle.Medium;
-            borderedCellStyle.BorderTop = BorderStyle.Medium;
-            borderedCellStyle.BorderRight = BorderStyle.Medium;
-            borderedCellStyle.BorderBottom = BorderStyle.Medium;
-            borderedCellStyle.VerticalAlignment = VerticalAlignment.Center;
-            borderedCellStyle.Alignment = HorizontalAlignment.Left;
-
-            HSSFCellStyle borderedCellStyleNumbers = (HSSFCellStyle)workbook.CreateCellStyle();
-            borderedCellStyleNumbers.BorderLeft = BorderStyle.Medium;
-            borderedCellStyleNumbers.BorderTop = BorderStyle.Medium;
-            borderedCellStyleNumbers.BorderRight = BorderStyle.Medium;
-            borderedCellStyleNumbers.BorderBottom = BorderStyle.Medium;
-            borderedCellStyleNumbers.VerticalAlignment = VerticalAlignment.Center;
-            borderedCellStyleNumbers.Alignment = HorizontalAlignment.Right;
+            CreateCellStyles(workbook, out HSSFCellStyle borderedCellStyle, out HSSFCellStyle borderedCellStyleNumbers, out HSSFCellStyle borderedCellStyleValuta);
 
             ISheet Sheet = workbook.CreateSheet("Forkerte priser");
             //Headere
@@ -75,14 +60,16 @@ internal class FileWriter
             CreateCell(HeaderRow, 1, "Skal blokeres", borderedCellStyle);
 
             //Informationer
-            CreateCell(HeaderRow, 2, "Total tab/vind", borderedCellStyle);
-            CreateCell(HeaderRow, 3, "Lagerbeholdning", borderedCellStyle);
-            CreateCell(HeaderRow, 4, "Pris difference", borderedCellStyle);
-            CreateCell(HeaderRow, 5, "Bog og ide's pris", borderedCellStyle);
-            CreateCell(HeaderRow, 6, "Butikkens pris", borderedCellStyle);
-            CreateCell(HeaderRow, 7, "Varenummer", borderedCellStyle);
-            CreateCell(HeaderRow, 8, "Navn", borderedCellStyle);
-            CreateCell(HeaderRow, 9, "Link", borderedCellStyle);
+            CreateCell(HeaderRow, 2, "Navn", borderedCellStyle);
+            CreateCell(HeaderRow, 3, "EAN stregkode", borderedCellStyle);
+            CreateCell(HeaderRow, 4, "Bog og ide's pris", borderedCellStyle);
+            CreateCell(HeaderRow, 5, "Butikkens pris", borderedCellStyle);
+            CreateCell(HeaderRow, 6, "Varenummer", borderedCellStyle);
+            CreateCell(HeaderRow, 7, "Total tab/vind", borderedCellStyle);
+            CreateCell(HeaderRow, 8, "Lagerbeholdning", borderedCellStyle);
+            CreateCell(HeaderRow, 9, "Pris difference", borderedCellStyle);
+
+            //CreateCell(HeaderRow, 9, "Link", borderedCellStyle);
 
             //Index til rækkerne, da første række jo er titler
             int RowIndex = 1;
@@ -95,15 +82,25 @@ internal class FileWriter
                 CreateCell(CurrentRow, 1, "", borderedCellStyle);
 
                 //Informationer
-                CreateCell(CurrentRow, 2, ((product.Stock * product.DifferentialPrice) * -1).ToString("0.00"), borderedCellStyleNumbers);
-                CreateCell(CurrentRow, 3, product.Stock.ToString(), borderedCellStyleNumbers);
-                CreateCell(CurrentRow, 4, (product.DifferentialPrice * -1).ToString("0.00"), borderedCellStyleNumbers);
-                CreateCell(CurrentRow, 5, product.AlternatePrice.ToString("0.00"), borderedCellStyleNumbers);
-                CreateCell(CurrentRow, 6, product.CurrentPrice.ToString("0.00"), borderedCellStyleNumbers);
+                CreateCell(CurrentRow, 2, product.ProductName, borderedCellStyle);
+                if (product.EAN != null)
+                {
+                    CreateCell(CurrentRow, 3, product.EAN, borderedCellStyleNumbers);
+                }
+                else
+                {
+                    CreateCell(CurrentRow, 3, "EAN kode ikke fundet", borderedCellStyle);
+                }
 
-                CreateCell(CurrentRow, 7, product.ProductNumber.ToString(), borderedCellStyle);
-                CreateCell(CurrentRow, 8, product.ProductName, borderedCellStyle);
-                CreateCell(CurrentRow, 9, product.Url, borderedCellStyle);
+                CreateNumericCell(CurrentRow, 4, product.AlternatePrice, borderedCellStyleValuta);
+                CreateNumericCell(CurrentRow, 5, product.CurrentPrice, borderedCellStyleValuta);
+                CreateNumericCell(CurrentRow, 6, int.Parse(product.ProductNumber), borderedCellStyleNumbers);
+                CreateNumericCell(CurrentRow, 7, ((product.Stock * product.DifferentialPrice) * -1), borderedCellStyleValuta);
+                CreateNumericCell(CurrentRow, 8, product.Stock, borderedCellStyleNumbers);
+                CreateNumericCell(CurrentRow, 9, (product.DifferentialPrice * -1), borderedCellStyleValuta);
+
+                //CreateCell(CurrentRow, 9, product.Url, borderedCellStyle);
+
                 RowIndex++;
             }
 
@@ -131,24 +128,48 @@ internal class FileWriter
         return true;
     }
 
+    private static void CreateCellStyles(HSSFWorkbook workbook, out HSSFCellStyle borderedCellStyle, out HSSFCellStyle borderedCellStyleNumbers, out HSSFCellStyle borderedCellStyleValuta)
+    {
+        borderedCellStyle = (HSSFCellStyle)workbook.CreateCellStyle();
+        borderedCellStyle.BorderLeft = BorderStyle.Medium;
+        borderedCellStyle.BorderTop = BorderStyle.Medium;
+        borderedCellStyle.BorderRight = BorderStyle.Medium;
+        borderedCellStyle.BorderBottom = BorderStyle.Medium;
+        borderedCellStyle.VerticalAlignment = VerticalAlignment.Center;
+        borderedCellStyle.Alignment = HorizontalAlignment.Left;
+
+        borderedCellStyleNumbers = (HSSFCellStyle)workbook.CreateCellStyle();
+        borderedCellStyleNumbers.BorderLeft = BorderStyle.Medium;
+        borderedCellStyleNumbers.BorderTop = BorderStyle.Medium;
+        borderedCellStyleNumbers.BorderRight = BorderStyle.Medium;
+        borderedCellStyleNumbers.BorderBottom = BorderStyle.Medium;
+        borderedCellStyleNumbers.VerticalAlignment = VerticalAlignment.Center;
+        borderedCellStyleNumbers.Alignment = HorizontalAlignment.Right;
+        borderedCellStyleNumbers.DataFormat = 1;
+
+        borderedCellStyleValuta = (HSSFCellStyle)workbook.CreateCellStyle();
+        borderedCellStyleValuta.BorderLeft = BorderStyle.Medium;
+        borderedCellStyleValuta.BorderTop = BorderStyle.Medium;
+        borderedCellStyleValuta.BorderRight = BorderStyle.Medium;
+        borderedCellStyleValuta.BorderBottom = BorderStyle.Medium;
+        borderedCellStyleValuta.VerticalAlignment = VerticalAlignment.Center;
+        borderedCellStyleValuta.Alignment = HorizontalAlignment.Right;
+        borderedCellStyleValuta.DataFormat = 2;
+    }
+
     private static void CreateCell(IRow currentRow, int cellIndex, string value, HSSFCellStyle style, bool? isHyperlink = false)
     {
         ICell cell = currentRow.CreateCell(cellIndex);
-        if (isHyperlink == true)
-        {
-            try
-            {
-                style.WrapText = true;
-                cell.SetCellFormula("HYPERLINK(INDIRECT(\"H\" & ROW()), \"Hello\")");
-            }
-            catch (Exception e)
-            {
-                var logger = new LoggingService<FileWriter>();
-                logger.CreateError($"{e.Message}: formula: {value}");
-                Console.ReadKey();
-                throw;
-            }
-        }
+        cell.SetCellValue(value);
+        cell.CellStyle = style;
+    }
+
+    private static void CreateNumericCell(IRow currentRow, int cellIndex, double value, HSSFCellStyle style)
+    {
+        ICell cell = currentRow.CreateCell(cellIndex);
+        cell.SetCellType(CellType.Numeric);
+
+        
         cell.SetCellValue(value);
         cell.CellStyle = style;
     }
