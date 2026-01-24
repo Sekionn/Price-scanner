@@ -1,7 +1,4 @@
-﻿using NPOI.SS.Formula.Functions;
-using Org.BouncyCastle.Asn1.X509;
-
-namespace price_bot.Timer;
+﻿namespace price_bot.Timer;
 public class Timer(int delayInHours)
 {
     TimeSpan TargetTime = TimeSpan.FromHours(delayInHours);

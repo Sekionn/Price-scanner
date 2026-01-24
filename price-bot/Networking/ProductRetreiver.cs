@@ -2,6 +2,7 @@
 using price_bot.FileReaders;
 using price_bot.Logging;
 using price_bot.Models;
+using price_bot.Style;
 using System.Text.Json;
 
 namespace price_bot.Networking;
@@ -13,7 +14,7 @@ public class ProductRetreiver
     {
         FileReader fileReader = new();
         var products = FileReader.ReadExcel();
-
+        ProgressBarService progressBarService = new ProgressBarService();
         List<IncorrectlyPricedProduct> incorrectProducts = [];
 
         if (products == null || products.Count <= 0)
@@ -23,18 +24,20 @@ public class ProductRetreiver
         }
         var logger = new LoggingService<ProductRetreiver>();
 
-        int productNumberCount = 0;
+        int productNumberCount = 1;
         foreach (var product in products)
         {
-            Console.WriteLine($"Tjekker varenummer: {product.ProductNumber}");
-            logger.CreateLog($"Checked productnumber count {productNumberCount}");
+            ProgressBarService.UpdateProgressBar(products.Count, productNumberCount);
+
+            //Console.WriteLine($"Tjekker varenummer: {product.ProductNumber}");
+            //logger.CreateLog($"Checked productnumber count {productNumberCount}");
             var websiteProduct = await GetProductFromAPI(product);
 
             if (websiteProduct != null)
             {
                 if (!product.Price.Equals(websiteProduct.price))
                 {
-                    Console.WriteLine($"Pris der ikke stemmer overens fundet på varenummer: {product.ProductNumber}");
+                    //Console.WriteLine($"Pris der ikke stemmer overens fundet på varenummer: {product.ProductNumber}");
                     incorrectProducts.Add(new IncorrectlyPricedProduct
                     {
                         CurrentPrice = product.Price,
@@ -49,19 +52,19 @@ public class ProductRetreiver
                 }
                 else
                 {
-                    Console.WriteLine($"Pris stemmer overens på varenummer: {product.ProductNumber}");
+                    //Console.WriteLine($"Pris stemmer overens på varenummer: {product.ProductNumber}");
                 }
             }
             else
             {
-                Console.WriteLine($"Advarsel: vare ikke fundet på bog og ide's hjemmeside under varenummer: {product.ProductNumber}");
+                //TODO: tilføj ny måde at vise advarsler på
+                //Console.WriteLine($"Advarsel: vare ikke fundet på bog og ide's hjemmeside under varenummer: {product.ProductNumber}");
             }
-            Console.WriteLine($"Sleeping");
             Thread.Sleep(1000);
-            Console.WriteLine($"Awake");
             productNumberCount++;
         }
 
+        Console.Write("\n");
         return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.DifferentialPrice)];
     }
 

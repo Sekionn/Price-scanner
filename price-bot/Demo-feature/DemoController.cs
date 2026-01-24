@@ -30,9 +30,9 @@ public class DemoController
         {
             var applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-            var directory = Directory.CreateDirectory(Path.Combine(applicationDataPath, "price-scanner"));
+            var directory = Directory.CreateDirectory(Path.Combine(applicationDataPath, "price-scanner\\Demo.txt"));
 
-            using (StreamWriter w = File.AppendText(directory + "\\Demo.txt"))
+            using (StreamWriter w = File.AppendText(directory.ToString()))
             {
                 var date = DateOnly.FromDateTime(DateTime.Now);
                 w.Write($"{date}");
