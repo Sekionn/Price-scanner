@@ -2,10 +2,30 @@
 using price_bot.FileReaders.FileModels;
 using price_bot.Logging;
 using price_bot.Models;
+using System.Text.Json;
 
 namespace price_bot.FileReaders;
 public class FileReader
 {
+    public static T? ReadJson<T>(string filename)
+    {
+        var applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        if(!File.Exists(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.json")))
+        {
+            return default;
+        }
+
+        using (StreamReader r = new StreamReader(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.json")))
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+            return JsonSerializer.Deserialize<T>(r.ReadToEnd(), options);
+        }
+    }
+
     public static List<AlstroemsProduct> ReadExcel()
     {
         Console.WriteLine("\nTjekker efter excel fil");

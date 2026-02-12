@@ -1,14 +1,37 @@
-﻿using NPOI.HSSF.UserModel;
+﻿using Newtonsoft.Json;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
-using NPOI.Util;
 using price_bot.Enums;
+using price_bot.Interfaces;
 using price_bot.Logging;
 using price_bot.Models;
+using System.IO;
+using System.Text.Json;
 
 namespace price_bot.FileWriter;
-internal class FileWriter
+public class FileWriter
 {
-    public async Task<bool> WriteTXTFile(List<IncorrectlyPricedProduct> products)
+    public static async Task WriteJSONFile(IJSONSerializable data, string filename)
+    {
+        var applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        if (!File.Exists(Path.Combine(applicationDataPath, $"price-scanner")))
+        {
+            Directory.CreateDirectory(Path.Combine(applicationDataPath, $"price-scanner"));
+        }
+
+        //StreamReader sr = new StreamReader(Path.Combine(applicationDataPath, "price-scanner\\Demo.txt"));
+        //string json = JsonSerializer.Serialize(data);
+        //File.WriteAllText(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.txt"), json);
+
+        //await using FileStream createStream = File.Create(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.json"));
+        
+        File.WriteAllText(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.json"),
+            JsonConvert.SerializeObject(data));
+        return;
+    }
+
+    public static bool WriteTXTFile(List<IncorrectlyPricedProduct> products)
     {
         using (StreamWriter outputFile = new(Path.Combine(@"Forkerte priser\Forkerte priser.txt")))
         {
@@ -42,7 +65,7 @@ internal class FileWriter
         return true;
     }
 
-    public async Task<bool> WriteExcelFile(List<IncorrectlyPricedProduct> products)
+    public static bool WriteExcelFile(List<IncorrectlyPricedProduct> products)
     {
         try
         {

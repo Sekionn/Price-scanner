@@ -30,7 +30,7 @@ public class ProductRetreiver
             ProgressBarService.UpdateProgressBar(products.Count, productNumberCount);
 
             //Console.WriteLine($"Tjekker varenummer: {product.ProductNumber}");
-            //logger.CreateLog($"Checked productnumber count {productNumberCount}");
+            logger.CreateLog($"Checked productnumber count {productNumberCount}");
             var websiteProduct = await GetProductFromAPI(product);
 
             if (websiteProduct != null)
