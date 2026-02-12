@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     branches:
-      - Velo_pack
+      - master
 jobs:
   deploy-to-github-releases:
     runs-on: windows-latest
