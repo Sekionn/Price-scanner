@@ -1,11 +1,23 @@
-﻿using price_bot.Demo_feature;
+using price_bot.Demo_feature;
 using price_bot.FileWriter;
 using price_bot.Logging;
 using price_bot.Networking;
+using price_bot.Updater;
+using Velopack;
 internal class Program
 {
     private static async Task Main(string[] args)
     {
+        VelopackApp.Build().Run();
+
+        bool updateReady = await VelopackUpdaterService.CheckForUpdates();
+
+        if (updateReady)
+        {
+            Console.WriteLine("We are updating...");
+            await VelopackUpdaterService.ApplyUpdate();
+        }
+
         var versionRetreiver = new VersionRetreiver();
         var demoController = new DemoController();
 
