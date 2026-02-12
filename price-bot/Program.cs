@@ -8,16 +8,15 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        //VelopackApp.Build().Run();
+        VelopackApp.Build().Run();
 
-        //bool updateReady = await VelopackUpdaterService.CheckForUpdates();
-        
-        //if (updateReady)
-        //{
-        //    await VelopackUpdaterService.ApplyUpdate();
-        //}
+        bool updateReady = await VelopackUpdaterService.CheckForUpdates();
 
-
+        if (updateReady)
+        {
+            Console.WriteLine("We are updating...");
+            await VelopackUpdaterService.ApplyUpdate();
+        }
 
         var versionRetreiver = new VersionRetreiver();
         var demoController = new DemoController();

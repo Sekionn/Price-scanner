@@ -1,14 +1,15 @@
 ﻿using Velopack;
+using Velopack.Sources;
 
 namespace price_bot.Updater
 {
     public class VelopackUpdaterService
     {
-        const string updatePath = "https://the.place/you-host/updates";
+        const string updatePath = "https://github.com/Sekionn/Price-scanner";
 
         public static async Task<bool> CheckForUpdates()
         {
-            var mgr = new UpdateManager(updatePath);
+            var mgr = new UpdateManager(new GithubSource(updatePath, null, false));
 
             // check for new version
             var newVersion = await mgr.CheckForUpdatesAsync();
@@ -20,7 +21,7 @@ namespace price_bot.Updater
 
         public static async Task ApplyUpdate()
         {
-            var mgr = new UpdateManager(updatePath);
+            var mgr = new UpdateManager(new GithubSource(updatePath, null, false));
 
             // check for new version
             var newVersion = await mgr.CheckForUpdatesAsync();
