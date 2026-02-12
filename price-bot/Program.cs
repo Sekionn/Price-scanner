@@ -3,6 +3,7 @@ using price_bot.FileWriter;
 using price_bot.Logging;
 using price_bot.Models;
 using price_bot.Networking;
+using price_bot.Verification;
 internal class Program
 {
     private static async Task Main(string[] args)
