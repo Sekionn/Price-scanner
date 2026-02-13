@@ -10,16 +10,6 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        VelopackApp.Build().Run();
-#if !DEBUG
-        bool updateReady = await VelopackUpdaterService.CheckForUpdates();
-
-        if (updateReady)
-        {
-            Console.WriteLine("We are updating...");
-            await VelopackUpdaterService.ApplyUpdate();
-        }
-#endif
         var versionRetreiver = new VersionRetreiver();
         var demoController = new DemoController();
 
@@ -30,9 +20,31 @@ internal class Program
             {
                 demoController.StartDemo();
             }
-            
+
         }
 
+        VelopackApp.Build().Run();
+#if !DEBUG
+        bool updateReady = await VelopackUpdaterService.CheckForUpdates();
+
+        if (updateReady)
+        {
+            Console.WriteLine("We are updating...");
+            await VelopackUpdaterService.ApplyUpdate();
+        } 
+        else 
+        {
+#endif
+        await RunProgram(versionRetreiver, demoController);
+
+#if !DEBUG
+        }
+#endif
+
+    }
+
+    private static async Task RunProgram(VersionRetreiver versionRetreiver, DemoController demoController)
+    {
         var logger = new LoggingService<Program>();
         string command = "";
         while (!command!.Equals("exit", StringComparison.CurrentCultureIgnoreCase))
