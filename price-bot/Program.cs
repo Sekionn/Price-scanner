@@ -201,11 +201,8 @@ internal class Program
                     DirectoryInfo di = Directory.CreateDirectory("Forkerte priser");
                     logger.CreateLog($"The directory was created successfully at {Directory.GetCreationTime("Forkerte priser")}.");
 
-                    FileWriter fileWriter = new();
-                    await fileWriter.WriteTXTFile(incorrectProducts);
-                    await fileWriter.WriteExcelFile(incorrectProducts);
-                FileWriter.WriteTXTFile(incorrectProducts);
-                FileWriter.WriteExcelFile(incorrectProducts);
+                    FileWriter.WriteTXTFile(incorrectProducts);
+                    FileWriter.WriteExcelFile(incorrectProducts);
 
                     Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Forkerte priser"), UseShellExecute = true });
                     Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Forkerte priser\Forkerte priser.xls"), UseShellExecute = true });
