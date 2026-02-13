@@ -61,6 +61,10 @@ internal class Program
                 Console.WriteLine("exit (dette vil slukke programmet)");
 
                 command = Console.ReadLine()!;
+                if (command == "exit") 
+                {
+                    break;
+                }
             }
             else
             {
