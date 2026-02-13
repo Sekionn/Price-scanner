@@ -2,10 +2,12 @@ using NPOI.HPSF;
 using price_bot.Demo_feature;
 using price_bot.FileWriter;
 using price_bot.Logging;
+using price_bot.Models;
 using price_bot.Networking;
 using price_bot.Updater;
 using System.Diagnostics;
 using Velopack;
+using price_bot.Verification;
 internal class Program
 {
     private static async Task Main(string[] args)
@@ -23,6 +25,8 @@ internal class Program
 
         }
 
+
+
         VelopackApp.Build().Run();
 #if !DEBUG
         bool updateReady = await VelopackUpdaterService.CheckForUpdates();
@@ -35,16 +39,103 @@ internal class Program
         else 
         {
 #endif
-        await RunProgram(versionRetreiver, demoController);
 
+        var verified = await WaitForVerification();
+        if (verified)
+        {
+            await RunProgram(versionRetreiver, demoController);
+        }
+        else
+        {
+            Console.ReadKey();
+        }
 #if !DEBUG
         }
 #endif
 
     }
 
+    private static async Task<bool> WaitForVerification()
+    {
+        License? license = VerificationService.GetLicenseData();
+        LicenseVerifier licenseVerifier = new LicenseVerifier();
+        bool licenseChecked = false;
+        while (license == null)
+        {
+            Console.Clear();
+            Console.WriteLine("Der er ikke fundet en licens tilknyttet denne installation.");
+            Console.WriteLine("Hvis du har en kan du indtaste den nu, ellers kontakt udvikleren af systemet.");
+            Console.WriteLine("Indtast email:");
+
+            var email = Console.ReadLine();
+
+            Console.WriteLine("Indtast licens noeglen:");
+
+            var key = Console.ReadLine();
+            if (email != null && key != null)
+            {
+                License tempLicense = new(email, key);
+
+                tempLicense.ShopId = await licenseVerifier.VerifyLicenseAsync(tempLicense);
+
+                if (tempLicense.ShopId.HasValue)
+                {
+                    licenseChecked = true;
+                    license = tempLicense;
+
+                    await VerificationService.UpdateLicenseData(license);
+
+                    Console.WriteLine("Denne licens er nu verificeret og du har nu adgang til systemet god fornoejelse.");
+                }
+                else
+                {
+                    Console.WriteLine("Email eller licens noegle er ikke indtastet korrekt proev igen");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Email eller licens noegle er ikke indtastet korrekt proev igen");
+            }
+        }
+
+        if (!licenseChecked) 
+        {
+            var response = await licenseVerifier.VerifyLicenseAsync(license);
+
+            if (response == null)
+            {
+                Console.WriteLine("Your license was not found, contact sebastian for help");
+                license = null;
+            }
+        }
+
+        if (license != null)
+        {
+            var response = await licenseVerifier.GetActiveStatus(license);
+
+            if (!response.HasValue)
+            {
+                return false;
+            }
+            else
+            {
+                if (response.Value == true)
+                {
+                    Console.WriteLine("Your license is currently in use elsewhere.");
+                }
+
+                return !response.Value;
+            }
+        }
+
+        return false;
+    }
+
     private static async Task RunProgram(VersionRetreiver versionRetreiver, DemoController demoController)
     {
+        await VerificationService.ActivateLicense();
+
         var logger = new LoggingService<Program>();
         string command = "";
         while (!command!.Equals("exit", StringComparison.CurrentCultureIgnoreCase))
@@ -153,9 +244,8 @@ internal class Program
                     DirectoryInfo di = Directory.CreateDirectory("Forkerte priser");
                     logger.CreateLog($"The directory was created successfully at {Directory.GetCreationTime("Forkerte priser")}.");
 
-                    FileWriter fileWriter = new();
-                    await fileWriter.WriteTXTFile(incorrectProducts);
-                    await fileWriter.WriteExcelFile(incorrectProducts);
+                    FileWriter.WriteTXTFile(incorrectProducts);
+                    FileWriter.WriteExcelFile(incorrectProducts);
 
                     Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Forkerte priser"), UseShellExecute = true });
                     Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Forkerte priser\Forkerte priser.xls"), UseShellExecute = true });
@@ -168,6 +258,7 @@ internal class Program
                 }
             }
         }
+        await VerificationService.DeactivateLicense();
         Console.WriteLine("Farvel");
         Thread.Sleep(100);
     }

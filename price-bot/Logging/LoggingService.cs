@@ -4,28 +4,19 @@ using price_bot.Enums;
 namespace price_bot.Logging;
 public class LoggingService<TClass>
 {
-    private readonly ILogger<TClass> _logger;
 
     public LoggingService() 
     {
-        DirectoryInfo di = Directory.CreateDirectory("Logs");
-        using var loggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder.AddConsole();
-        });
-        _logger = loggerFactory.CreateLogger<TClass>();
-        
+        Directory.CreateDirectory("Logs");
     }
 
     public void CreateLog(string log)
     {
-        _logger.LogInformation(log);
         LogWrite(log, LogType.Information);
     }
 
     public void CreateError(string error)
     {
-        _logger.LogError(error);
         LogWrite(error, LogType.Error);
     }
 
