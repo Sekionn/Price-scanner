@@ -62,8 +62,6 @@ internal class Program
 
                 while (files <= 0 || command!.Equals("excel", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    var applicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
                     Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Filer"), UseShellExecute = true });
 
                     Console.WriteLine("Du kan nu tilføje din excel fil, når dette er gjort kan du skrive start for at starte programmet");
@@ -74,7 +72,16 @@ internal class Program
 
                 if (command.Equals("forkert", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Forkerte priser"), UseShellExecute = true });
+                    if (File.Exists(Path.GetFullPath("Forkerte priser\\Forkerte priser.xls")))
+                    {
+                        Process.Start(new ProcessStartInfo { FileName = Path.GetFullPath(@"Forkerte priser"), UseShellExecute = true });
+                    }
+                    else
+                    {
+                        Console.WriteLine("På nuværende tidspunkt er der ikke nogen forkert pris fil tilgængelig");
+                        Console.WriteLine("for at lave om på det kan du bruge kommandoen 'start'");
+                        Thread.Sleep(100);
+                    }
                 }
                 else if (command.Equals("start", StringComparison.CurrentCultureIgnoreCase))
                 {
