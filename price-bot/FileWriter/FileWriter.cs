@@ -20,12 +20,6 @@ public class FileWriter
             Directory.CreateDirectory(Path.Combine(applicationDataPath, $"price-scanner"));
         }
 
-        //StreamReader sr = new StreamReader(Path.Combine(applicationDataPath, "price-scanner\\Demo.txt"));
-        //string json = JsonSerializer.Serialize(data);
-        //File.WriteAllText(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.txt"), json);
-
-        //await using FileStream createStream = File.Create(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.json"));
-        
         File.WriteAllText(Path.Combine(applicationDataPath, $"price-scanner\\{filename}.json"),
             JsonConvert.SerializeObject(data));
         return;

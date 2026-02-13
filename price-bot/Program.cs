@@ -25,14 +25,41 @@ internal class Program
 
         }
 
+
+
         VelopackApp.Build().Run();
 #if !DEBUG
         bool updateReady = await VelopackUpdaterService.CheckForUpdates();
-        var logger = new LoggingService<Program>();
 
+        if (updateReady)
+        {
+            Console.WriteLine("We are updating...");
+            await VelopackUpdaterService.ApplyUpdate();
+        } 
+        else 
+        {
+#endif
+
+        var verified = await WaitForVerification();
+        if (verified)
+        {
+            await RunProgram(versionRetreiver, demoController);
+        }
+        else
+        {
+            Console.ReadKey();
+        }
+#if !DEBUG
+        }
+#endif
+
+    }
+
+    private static async Task<bool> WaitForVerification()
+    {
         License? license = VerificationService.GetLicenseData();
         LicenseVerifier licenseVerifier = new LicenseVerifier();
-
+        bool licenseChecked = false;
         while (license == null)
         {
             Console.Clear();
@@ -53,6 +80,7 @@ internal class Program
 
                 if (tempLicense.ShopId.HasValue)
                 {
+                    licenseChecked = true;
                     license = tempLicense;
 
                     await VerificationService.UpdateLicenseData(license);
@@ -71,28 +99,43 @@ internal class Program
             }
         }
 
-        Console.Clear();
-
-        string? command = null;
-
-        if (updateReady)
+        if (!licenseChecked) 
         {
-            Console.WriteLine("We are updating...");
-            await VelopackUpdaterService.ApplyUpdate();
-        } 
-        else 
-        {
-#endif
-        await RunProgram(versionRetreiver, demoController);
+            var response = await licenseVerifier.VerifyLicenseAsync(license);
 
-#if !DEBUG
+            if (response == null)
+            {
+                Console.WriteLine("Your license was not found, contact sebastian for help");
+                license = null;
+            }
         }
-#endif
 
+        if (license != null)
+        {
+            var response = await licenseVerifier.GetActiveStatus(license);
+
+            if (!response.HasValue)
+            {
+                return false;
+            }
+            else
+            {
+                if (response.Value == true)
+                {
+                    Console.WriteLine("Your license is currently in use elsewhere.");
+                }
+
+                return !response.Value;
+            }
+        }
+
+        return false;
     }
 
     private static async Task RunProgram(VersionRetreiver versionRetreiver, DemoController demoController)
     {
+        await VerificationService.ActivateLicense();
+
         var logger = new LoggingService<Program>();
         string command = "";
         while (!command!.Equals("exit", StringComparison.CurrentCultureIgnoreCase))
@@ -215,6 +258,7 @@ internal class Program
                 }
             }
         }
+        await VerificationService.DeactivateLicense();
         Console.WriteLine("Farvel");
         Thread.Sleep(100);
     }

@@ -30,7 +30,6 @@ public class BaseClient
     internal async Task<string> Get(string url)
     {
         HttpResponseMessage response = await client.GetAsync(url);
-        response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
     internal async Task<string> Post<T>(string url, T content)
@@ -38,7 +37,14 @@ public class BaseClient
         var stringContent = new StringContent(JsonConvert.SerializeObject(content).ToLower(), Encoding.UTF8, "application/json");
 
         HttpResponseMessage response = await client.PostAsync(url, stringContent);
-        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    internal async Task<string> Patch<T>(string url, T content)
+    {
+        var stringContent = new StringContent(JsonConvert.SerializeObject(content).ToLower(), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response = await client.PatchAsync(url, stringContent);
         return await response.Content.ReadAsStringAsync();
     }
 }
