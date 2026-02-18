@@ -20,7 +20,7 @@ public class LoggingService<TClass>
         LogWrite(error, LogType.Error);
     }
 
-    public void LogWrite(string logMessage, LogType logType)
+    private void LogWrite(string logMessage, LogType logType)
     {
         try
         {

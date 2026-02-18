@@ -9,7 +9,7 @@ namespace price_bot.Networking;
 public class ProductRetreiver
 {
     static readonly HttpClient client = new();
-
+    LoggingService<ProductRetreiver> _logger = new LoggingService<ProductRetreiver>();
     public async Task<List<IncorrectlyPricedProduct>> GetProductsWithIncorrectPrices()
     {
         FileReader fileReader = new();
@@ -22,22 +22,19 @@ public class ProductRetreiver
             Console.WriteLine("Der var ingen varer i excel filen");
             return incorrectProducts;
         }
-        var logger = new LoggingService<ProductRetreiver>();
 
         int productNumberCount = 1;
         foreach (var product in products)
         {
             ProgressBarService.UpdateProgressBar(products.Count, productNumberCount);
 
-            //Console.WriteLine($"Tjekker varenummer: {product.ProductNumber}");
-            logger.CreateLog($"Checked productnumber count {productNumberCount}");
+            _logger.CreateLog($"Checked productnumber count {productNumberCount}");
             var websiteProduct = await GetProductFromAPI(product);
 
             if (websiteProduct != null)
             {
                 if (!product.Price.Equals(websiteProduct.price))
                 {
-                    //Console.WriteLine($"Pris der ikke stemmer overens fundet på varenummer: {product.ProductNumber}");
                     incorrectProducts.Add(new IncorrectlyPricedProduct
                     {
                         CurrentPrice = product.Price,
@@ -50,15 +47,10 @@ public class ProductRetreiver
                         EAN = product.EAN
                     });
                 }
-                else
-                {
-                    //Console.WriteLine($"Pris stemmer overens på varenummer: {product.ProductNumber}");
-                }
             }
             else
             {
-                //TODO: tilføj ny måde at vise advarsler på
-                //Console.WriteLine($"Advarsel: vare ikke fundet på bog og ide's hjemmeside under varenummer: {product.ProductNumber}");
+                _logger.CreateError($"vare ikke fundet på bog og ide's hjemmeside under varenummer: {product.ProductNumber}");
             }
             Thread.Sleep(1000);
             productNumberCount++;
@@ -71,11 +63,20 @@ public class ProductRetreiver
     internal async Task<Product?> GetProductFromAPI(AlstroemsProduct product)
     {
         HttpResponseMessage response = await client.GetAsync($"https://www.bog-ide.dk/api/search/all?PageIndex=0&PageSize=4&Search={product.ProductNumber}");
-        response.EnsureSuccessStatusCode();
-        string responseBody = await response.Content.ReadAsStringAsync();
 
-        SearchDTO searchData = JsonSerializer.Deserialize<SearchDTO>(responseBody)!;
+        try
+        {
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
 
-        return searchData.products.results.Where(p => p.productNumber.Equals(product.ProductNumber)).FirstOrDefault();
+            SearchDTO searchData = JsonSerializer.Deserialize<SearchDTO>(responseBody)!;
+
+            return searchData.products.results.Where(p => p.productNumber.Equals(product.ProductNumber)).FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            _logger.CreateError(e.Message);
+            return null;
+        }
     }
 }
