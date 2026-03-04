@@ -1,4 +1,4 @@
-﻿using price_bot.Models;
+using price_bot.Models;
 using System.Text.Json;
 
 namespace price_bot.Networking;
@@ -10,8 +10,15 @@ public class LicenseVerifier : BaseClient
     public async Task<Guid?> VerifyLicenseAsync(License license)
     {
         string response = await Post(baseUrl + $"shop/verified", license);
-
-        return JsonSerializer.Deserialize<Guid?>(response);
+        try
+        {
+            return JsonSerializer.Deserialize<Guid?>(response);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        
     }
 
     public async Task<bool?> GetActiveStatus(License license)
