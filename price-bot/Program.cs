@@ -134,12 +134,13 @@ internal class Program
 
     private static async Task RunProgram(VersionRetreiver versionRetreiver, DemoController demoController)
     {
-        await VerificationService.ActivateLicense();
 
         var logger = new LoggingService<Program>();
         string command = "";
         while (!command!.Equals("exit", StringComparison.CurrentCultureIgnoreCase))
         {
+            await VerificationService.ActivateLicense();
+
             Console.Clear();
 
             if (!versionRetreiver.IsDemoVersion() || !demoController.HasDemoFinished())
@@ -257,6 +258,7 @@ internal class Program
                     logger.CreateLog($"Hvor lang tid tog det: {finishDate - startDate}");
                 }
             }
+            await VerificationService.DeactivateLicense();
         }
         await VerificationService.DeactivateLicense();
         Console.WriteLine("Farvel");
