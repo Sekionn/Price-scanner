@@ -14,6 +14,7 @@ public class IncorrectlyPricedProduct
     public required int Stock { get; init; }
     public required GrowthType GrowthType { get; init; }
     public required string Url { get; init; }
-    public string EAN { get; init; }
+    public string? EAN { get; init; }
+    public string? CategoryCode { get; init; }
 
 }

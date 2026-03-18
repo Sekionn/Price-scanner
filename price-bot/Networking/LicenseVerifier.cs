@@ -1,3 +1,4 @@
+using price_bot.Logging;
 using price_bot.Models;
 using System.Text.Json;
 
@@ -6,6 +7,7 @@ namespace price_bot.Networking;
 public class LicenseVerifier : BaseClient
 {
     string baseUrl = "https://price-bot.juuls-trinkets.com/";
+    LoggingService<LicenseVerifier> _logger = new LoggingService<LicenseVerifier>();
 
     public async Task<Guid?> VerifyLicenseAsync(License license)
     {
@@ -14,8 +16,10 @@ public class LicenseVerifier : BaseClient
         {
             return JsonSerializer.Deserialize<Guid?>(response);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            _logger.CreateError(e.Message);
+
             return null;
         }
         
@@ -29,9 +33,12 @@ public class LicenseVerifier : BaseClient
         {
             return JsonSerializer.Deserialize<bool?>(response);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            _logger.CreateError(e.Message);
+
             Console.WriteLine("Your license was not found, so could not check if it is active");
+            Console.ReadKey();
             return null;
         }
     }
@@ -44,8 +51,10 @@ public class LicenseVerifier : BaseClient
         {
             return JsonSerializer.Deserialize<int>(response);
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            _logger.CreateError(e.Message);
+
             Console.WriteLine("Noget gik galt så licensen er ikke ikke blevet aktiveret eller deaktiveret");
             Console.WriteLine("Dette kan betyde at du ikke kan aktivere programmet næste gang du starter det");
             Console.WriteLine("Kontakt Sebastian for hjælp");

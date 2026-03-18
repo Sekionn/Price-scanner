@@ -7,4 +7,5 @@ public class AlstroemsProduct
     public required string ProductNumber { get; init; }
     public required int Stock { get; init; }
     public string? EAN { get; init; }
+    public string? CategoryCode { get; init; }
 }

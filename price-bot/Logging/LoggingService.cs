@@ -31,7 +31,6 @@ public class LoggingService<TClass>
         }
         catch (Exception ex)
         {
-            Console.ReadKey();
         }
     }
 
@@ -48,7 +47,6 @@ public class LoggingService<TClass>
         }
         catch (Exception ex)
         {
-            Console.ReadKey();
         }
     }
 }

@@ -85,6 +85,7 @@ public class FileWriter
             CreateCell(HeaderRow, 7, "Total tab/vind", borderedCellStyle);
             CreateCell(HeaderRow, 8, "Lagerbeholdning", borderedCellStyle);
             CreateCell(HeaderRow, 9, "Pris difference", borderedCellStyle);
+            CreateCell(HeaderRow, 10, "Varekategorikode", borderedCellStyle);
 
             //CreateCell(HeaderRow, 9, "Link", borderedCellStyle);
 
@@ -115,6 +116,15 @@ public class FileWriter
                 CreateNumericCell(CurrentRow, 7, ((product.Stock * product.DifferentialPrice) * -1), borderedCellStyleValuta);
                 CreateNumericCell(CurrentRow, 8, product.Stock, borderedCellStyleNumbers);
                 CreateNumericCell(CurrentRow, 9, (product.DifferentialPrice * -1), borderedCellStyleValuta);
+
+                if (product.CategoryCode != null)
+                {
+                    CreateCell(CurrentRow, 10, product.CategoryCode, borderedCellStyleNumbers);
+                }
+                else
+                {
+                    CreateCell(CurrentRow, 10, "Kategorikode ikke fundet", borderedCellStyle);
+                }
 
                 //CreateCell(CurrentRow, 9, product.Url, borderedCellStyle);
 

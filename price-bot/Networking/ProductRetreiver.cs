@@ -44,7 +44,8 @@ public class ProductRetreiver
                         Stock = product.Stock,
                         GrowthType = product.Price > websiteProduct.price ? GrowthType.CostsLess : GrowthType.CostsMore,
                         Url = websiteProduct.url,
-                        EAN = product.EAN
+                        EAN = product.EAN,
+                        CategoryCode = product.CategoryCode
                     });
                 }
             }
