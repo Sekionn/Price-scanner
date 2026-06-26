@@ -1,4 +1,4 @@
-using price_bot.Logging;
+﻿using price_bot.Logging;
 using price_bot.Models;
 using System.Text.Json;
 
@@ -6,7 +6,7 @@ namespace price_bot.Networking;
 
 public class LicenseVerifier : BaseClient
 {
-    string baseUrl = "https://price-bot.juuls-trinkets.com/";
+    string baseUrl = "https://192.168.1.17:5656/";
     LoggingService<LicenseVerifier> _logger = new LoggingService<LicenseVerifier>();
 
     public async Task<Guid?> VerifyLicenseAsync(License license)

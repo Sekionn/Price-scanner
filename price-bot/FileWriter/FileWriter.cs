@@ -5,8 +5,6 @@ using price_bot.Enums;
 using price_bot.Interfaces;
 using price_bot.Logging;
 using price_bot.Models;
-using System.IO;
-using System.Text.Json;
 
 namespace price_bot.FileWriter;
 public class FileWriter
@@ -77,17 +75,16 @@ public class FileWriter
             CreateCell(HeaderRow, 1, "Skal blokeres", borderedCellStyle);
 
             //Informationer
-            CreateCell(HeaderRow, 2, "Navn", borderedCellStyle);
-            CreateCell(HeaderRow, 3, "EAN stregkode", borderedCellStyle);
-            CreateCell(HeaderRow, 4, "Bog og ide's pris", borderedCellStyle);
-            CreateCell(HeaderRow, 5, "Butikkens pris", borderedCellStyle);
-            CreateCell(HeaderRow, 6, "Varenummer", borderedCellStyle);
-            CreateCell(HeaderRow, 7, "Total tab/vind", borderedCellStyle);
-            CreateCell(HeaderRow, 8, "Lagerbeholdning", borderedCellStyle);
-            CreateCell(HeaderRow, 9, "Pris difference", borderedCellStyle);
-            CreateCell(HeaderRow, 10, "Varekategorikode", borderedCellStyle);
-
-            //CreateCell(HeaderRow, 9, "Link", borderedCellStyle);
+            CreateCell(HeaderRow, 2, "forfattere", borderedCellStyle);
+            CreateCell(HeaderRow, 3, "Navn", borderedCellStyle);
+            CreateCell(HeaderRow, 4, "EAN stregkode", borderedCellStyle);
+            CreateCell(HeaderRow, 5, "Bog og ide's pris", borderedCellStyle);
+            CreateCell(HeaderRow, 6, "Butikkens pris", borderedCellStyle);
+            CreateCell(HeaderRow, 7, "Varenummer", borderedCellStyle);
+            CreateCell(HeaderRow, 8, "Total tab/vind", borderedCellStyle);
+            CreateCell(HeaderRow, 9, "Lagerbeholdning", borderedCellStyle);
+            CreateCell(HeaderRow, 10, "Pris difference", borderedCellStyle);
+            CreateCell(HeaderRow, 11, "Varekategorikode", borderedCellStyle);
 
             //Index til rækkerne, da første række jo er titler
             int RowIndex = 1;
@@ -100,30 +97,39 @@ public class FileWriter
                 CreateCell(CurrentRow, 1, "", borderedCellStyle);
 
                 //Informationer
-                CreateCell(CurrentRow, 2, product.ProductName, borderedCellStyle);
-                if (product.EAN != null)
+                if (product.Authors != null)
                 {
-                    CreateCell(CurrentRow, 3, product.EAN, borderedCellStyleNumbers);
+                    CreateCell(CurrentRow, 2, product.Authors, borderedCellStyleNumbers);
                 }
                 else
                 {
-                    CreateCell(CurrentRow, 3, "EAN kode ikke fundet", borderedCellStyle);
+                    CreateCell(CurrentRow, 2, "", borderedCellStyle);
                 }
 
-                CreateNumericCell(CurrentRow, 4, product.AlternatePrice, borderedCellStyleValuta);
-                CreateNumericCell(CurrentRow, 5, product.CurrentPrice, borderedCellStyleValuta);
-                CreateNumericCell(CurrentRow, 6, int.Parse(product.ProductNumber), borderedCellStyleNumbers);
-                CreateNumericCell(CurrentRow, 7, ((product.Stock * product.DifferentialPrice) * -1), borderedCellStyleValuta);
-                CreateNumericCell(CurrentRow, 8, product.Stock, borderedCellStyleNumbers);
-                CreateNumericCell(CurrentRow, 9, (product.DifferentialPrice * -1), borderedCellStyleValuta);
+                CreateCell(CurrentRow, 3, product.ProductName, borderedCellStyle);
+                if (product.EAN != null)
+                {
+                    CreateCell(CurrentRow, 4, product.EAN, borderedCellStyleNumbers);
+                }
+                else
+                {
+                    CreateCell(CurrentRow, 4, "EAN kode ikke fundet", borderedCellStyle);
+                }
+
+                CreateNumericCell(CurrentRow, 5, product.AlternatePrice, borderedCellStyleValuta);
+                CreateNumericCell(CurrentRow, 6, product.CurrentPrice, borderedCellStyleValuta);
+                CreateNumericCell(CurrentRow, 7, int.Parse(product.ProductNumber), borderedCellStyleNumbers);
+                CreateNumericCell(CurrentRow, 8, ((product.Stock * product.DifferentialPrice) * -1), borderedCellStyleValuta);
+                CreateNumericCell(CurrentRow, 9, product.Stock, borderedCellStyleNumbers);
+                CreateNumericCell(CurrentRow, 10, (product.DifferentialPrice * -1), borderedCellStyleValuta);
 
                 if (product.CategoryCode != null)
                 {
-                    CreateCell(CurrentRow, 10, product.CategoryCode, borderedCellStyleNumbers);
+                    CreateCell(CurrentRow, 11, product.CategoryCode, borderedCellStyleNumbers);
                 }
                 else
                 {
-                    CreateCell(CurrentRow, 10, "Kategorikode ikke fundet", borderedCellStyle);
+                    CreateCell(CurrentRow, 11, "Kategorikode ikke fundet", borderedCellStyle);
                 }
 
                 //CreateCell(CurrentRow, 9, product.Url, borderedCellStyle);
