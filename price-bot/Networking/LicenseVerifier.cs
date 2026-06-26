@@ -6,7 +6,7 @@ namespace price_bot.Networking;
 
 public class LicenseVerifier : BaseClient
 {
-    string baseUrl = "https://192.168.1.17:5656/";
+    string baseUrl = "https://price-bot.juuls-trinkets.com/";
     LoggingService<LicenseVerifier> _logger = new LoggingService<LicenseVerifier>();
 
     public async Task<Guid?> VerifyLicenseAsync(License license)
