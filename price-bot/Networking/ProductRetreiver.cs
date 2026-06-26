@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace price_bot.Networking;
 public class ProductRetreiver
 {
-    static readonly string baseUrl = "http://localhost:8080/";
+    static readonly string baseUrl = "https://scraper.juuls-trinkets.com/";
     static readonly HttpClient client = new();
     LoggingService<ProductRetreiver> _logger = new LoggingService<ProductRetreiver>();
     public async Task<List<IncorrectlyPricedProduct>> GetProductsWithIncorrectPrices()
@@ -76,7 +76,7 @@ public class ProductRetreiver
             return incorrectProducts;
         }
 
-        const int batchSize = 100;
+        const int batchSize = 50;
 
         for (int i = 0; i < products.Count; i += batchSize)
         {
@@ -88,7 +88,7 @@ public class ProductRetreiver
                 .ToList();
             
             _logger.CreateLog($"Checked productnumber count {i}");
-            var scrapedProducts = await GetProductFromScraperAPI(batch.Select((p) => p.ProductNumber).ToList());
+            var scrapedProducts = await GetProductFromScraperAPI(batch.Select((p) => new ProductPriceLookupRequestDto { identifier = p.ProductNumber, name = p.ProductName, productType = p.ChainCategoryCode}).ToList());
 
             if (scrapedProducts != null)
             {
@@ -147,22 +147,28 @@ public class ProductRetreiver
         }
     }
 
-    internal async Task<List<ProductV2>> GetProductFromScraperAPI(List<string> productNumbers) {
-        client.Timeout = TimeSpan.FromMinutes(2);
+    internal async Task<List<ProductV2>> GetProductFromScraperAPI(List<ProductPriceLookupRequestDto> productNumbers) {
         try
         {
             HttpResponseMessage response = await client.PostAsync($"{baseUrl}api/prices/batch", JsonContent.Create(productNumbers));
 
-            response.EnsureSuccessStatusCode();
+            
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            List<ProductV2> responseProducts = JsonSerializer.Deserialize<List<ProductV2>>(responseBody)!;
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.CreateError(
+                    $"Scraper API failed. Status: {(int)response.StatusCode} {response.StatusCode}. Body: {responseBody}"
+                );
 
-            return responseProducts;
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<List<ProductV2>>(responseBody)!;
         }
         catch (Exception e)
         {
-            _logger.CreateError(e.Message);
+            _logger.CreateError(e.ToString());
             return null;
         }
     }
