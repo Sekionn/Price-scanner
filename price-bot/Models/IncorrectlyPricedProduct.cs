@@ -18,5 +18,5 @@ public class IncorrectlyPricedProduct
     public string? CategoryCode { get; init; }
     public string? Authors { get; init; }
 
-
+    public required bool specialOffer { get; init; }
 }

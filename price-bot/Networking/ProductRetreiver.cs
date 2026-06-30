@@ -12,56 +12,6 @@ public class ProductRetreiver
     static readonly string baseUrl = "https://scraper.juuls-trinkets.com/";
     static readonly HttpClient client = new();
     LoggingService<ProductRetreiver> _logger = new LoggingService<ProductRetreiver>();
-    public async Task<List<IncorrectlyPricedProduct>> GetProductsWithIncorrectPrices()
-    {
-        FileReader fileReader = new();
-        var products = FileReader.ReadExcel();
-        ProgressBarService progressBarService = new ProgressBarService();
-        List<IncorrectlyPricedProduct> incorrectProducts = [];
-
-        if (products == null || products.Count <= 0)
-        {
-            Console.WriteLine("Der var ingen varer i excel filen");
-            return incorrectProducts;
-        }
-
-        int productNumberCount = 1;
-        foreach (var product in products)
-        {
-            ProgressBarService.UpdateProgressBar(products.Count, productNumberCount);
-
-            _logger.CreateLog($"Checked productnumber count {productNumberCount}");
-            var websiteProduct = await GetProductFromAPI(product);
-
-            if (websiteProduct != null)
-            {
-                if (!product.Price.Equals(websiteProduct.price))
-                {
-                    incorrectProducts.Add(new IncorrectlyPricedProduct
-                    {
-                        CurrentPrice = product.Price,
-                        AlternatePrice = websiteProduct.price,
-                        ProductName = product.ProductName,
-                        ProductNumber = product.ProductNumber,
-                        Stock = product.Stock,
-                        GrowthType = product.Price > websiteProduct.price ? GrowthType.CostsLess : GrowthType.CostsMore,
-                        Url = websiteProduct.url,
-                        EAN = product.EAN,
-                        CategoryCode = product.CategoryCode
-                    });
-                }
-            }
-            else
-            {
-                _logger.CreateError($"vare ikke fundet på bog og ide's hjemmeside under varenummer: {product.ProductNumber}");
-            }
-            Thread.Sleep(1000);
-            productNumberCount++;
-        }
-
-        Console.Write("\n");
-        return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.DifferentialPrice)];
-    }
 
     public async Task<List<IncorrectlyPricedProduct>> GetProductsWithIncorrectPricesFromScraper()
     {
@@ -107,9 +57,10 @@ public class ProductRetreiver
                             Stock = productData.Stock,
                             GrowthType = productData.Price > scrapedProduct.price ? GrowthType.CostsLess : GrowthType.CostsMore,
                             Url = scrapedProduct.url,
-                            EAN = productData.EAN,
+                            EAN = scrapedProduct.eanNumber != null ? scrapedProduct.eanNumber : productData.EAN,
                             CategoryCode = productData.CategoryCode,
-                            Authors = scrapedProduct.author
+                            Authors = scrapedProduct.author,
+                            specialOffer = scrapedProduct.specialOffer
                         });
                     }
                 }
