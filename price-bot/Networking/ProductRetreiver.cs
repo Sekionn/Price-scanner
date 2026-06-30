@@ -123,7 +123,7 @@ public class ProductRetreiver
         }
 
         Console.Write("\n");
-        return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.Authors).OrderBy(p => p.DifferentialPrice)];
+        return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.DifferentialPrice)];
     }
 
 

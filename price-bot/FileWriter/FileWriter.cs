@@ -99,7 +99,7 @@ public class FileWriter
                 //Informationer
                 if (product.Authors != null)
                 {
-                    CreateCell(CurrentRow, 2, product.Authors, borderedCellStyleNumbers);
+                    CreateCell(CurrentRow, 2, product.Authors, borderedCellStyle);
                 }
                 else
                 {
