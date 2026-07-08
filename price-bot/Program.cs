@@ -240,7 +240,7 @@ internal class Program
                     DateTime startDate = DateTime.Now;
 
                     ProductRetreiver productRetreiver = new();
-                    var incorrectProducts = await productRetreiver.GetProductsWithIncorrectPrices();
+                    var incorrectProducts = await productRetreiver.GetProductsWithIncorrectPricesFromScraper();
 
                     DirectoryInfo di = Directory.CreateDirectory("Forkerte priser");
                     logger.CreateLog($"The directory was created successfully at {Directory.GetCreationTime("Forkerte priser")}.");

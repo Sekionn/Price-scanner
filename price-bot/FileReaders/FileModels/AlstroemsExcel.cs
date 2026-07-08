@@ -1,4 +1,5 @@
-﻿using price_bot.Models;
+﻿using Ganss.Excel;
+using price_bot.Models;
 
 namespace price_bot.FileReaders.FileModels;
 public class AlstroemsExcel
@@ -9,6 +10,8 @@ public class AlstroemsExcel
     public required int Lager { get; set; }
     public string? Labelstregkode { get; set; }
     public string? Varekategorikode { get; set; }
+    [Column("Kæde varekategorikode")]
+    public string? KædeVarekategorikode { get; set; }
 
     public AlstroemsProduct Convert()
     {
@@ -19,7 +22,8 @@ public class AlstroemsExcel
             Price = Double.Parse(String.Join("", Enhedspris.Split(',')).Replace('.', ',')),
             Stock = Lager,
             EAN = Labelstregkode,
-            CategoryCode = Varekategorikode
+            CategoryCode = Varekategorikode,
+            ChainCategoryCode = KædeVarekategorikode
         };
     }
 }

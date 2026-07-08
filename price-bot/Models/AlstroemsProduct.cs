@@ -8,4 +8,5 @@ public class AlstroemsProduct
     public required int Stock { get; init; }
     public string? EAN { get; init; }
     public string? CategoryCode { get; init; }
+    public string? ChainCategoryCode { get; init; }
 }

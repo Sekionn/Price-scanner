@@ -16,5 +16,7 @@ public class IncorrectlyPricedProduct
     public required string Url { get; init; }
     public string? EAN { get; init; }
     public string? CategoryCode { get; init; }
+    public string? Authors { get; init; }
 
+    public required bool specialOffer { get; init; }
 }

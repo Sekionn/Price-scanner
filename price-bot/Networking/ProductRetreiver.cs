@@ -3,14 +3,17 @@ using price_bot.FileReaders;
 using price_bot.Logging;
 using price_bot.Models;
 using price_bot.Style;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace price_bot.Networking;
 public class ProductRetreiver
 {
+    static readonly string baseUrl = "https://scraper.juuls-trinkets.com/";
     static readonly HttpClient client = new();
     LoggingService<ProductRetreiver> _logger = new LoggingService<ProductRetreiver>();
-    public async Task<List<IncorrectlyPricedProduct>> GetProductsWithIncorrectPrices()
+
+    public async Task<List<IncorrectlyPricedProduct>> GetProductsWithIncorrectPricesFromScraper()
     {
         FileReader fileReader = new();
         var products = FileReader.ReadExcel();
@@ -23,43 +26,57 @@ public class ProductRetreiver
             return incorrectProducts;
         }
 
-        int productNumberCount = 1;
-        foreach (var product in products)
+        const int batchSize = 50;
+
+        for (int i = 0; i < products.Count; i += batchSize)
         {
-            ProgressBarService.UpdateProgressBar(products.Count, productNumberCount);
+            ProgressBarService.UpdateProgressBar(products.Count, i);
 
-            _logger.CreateLog($"Checked productnumber count {productNumberCount}");
-            var websiteProduct = await GetProductFromAPI(product);
+            var batch = products
+                .Skip(i)
+                .Take(batchSize)
+                .ToList();
+            
+            _logger.CreateLog($"Checked productnumber count {i}");
+            var scrapedProducts = await GetProductFromScraperAPI(batch.Select((p) => new ProductPriceLookupRequestDto { identifier = p.ProductNumber, name = p.ProductName, productType = p.ChainCategoryCode}).ToList());
 
-            if (websiteProduct != null)
+            if (scrapedProducts != null)
             {
-                if (!product.Price.Equals(websiteProduct.price))
+                foreach (var scrapedProduct in scrapedProducts)
                 {
-                    incorrectProducts.Add(new IncorrectlyPricedProduct
+                    var productData = products.Where((p) => p.ProductNumber == scrapedProduct.productNumber).First();
+
+                    if (!productData.Price.Equals(scrapedProduct.price))
                     {
-                        CurrentPrice = product.Price,
-                        AlternatePrice = websiteProduct.price,
-                        ProductName = product.ProductName,
-                        ProductNumber = product.ProductNumber,
-                        Stock = product.Stock,
-                        GrowthType = product.Price > websiteProduct.price ? GrowthType.CostsLess : GrowthType.CostsMore,
-                        Url = websiteProduct.url,
-                        EAN = product.EAN,
-                        CategoryCode = product.CategoryCode
-                    });
+                        incorrectProducts.Add(new IncorrectlyPricedProduct
+                        {
+                            CurrentPrice = productData.Price,
+                            AlternatePrice = scrapedProduct.price,
+                            ProductName = productData.ProductName,
+                            ProductNumber = productData.ProductNumber,
+                            Stock = productData.Stock,
+                            GrowthType = productData.Price > scrapedProduct.price ? GrowthType.CostsLess : GrowthType.CostsMore,
+                            Url = scrapedProduct.url,
+                            EAN = scrapedProduct.eanNumber != null ? scrapedProduct.eanNumber : productData.EAN,
+                            CategoryCode = productData.CategoryCode,
+                            Authors = scrapedProduct.author,
+                            specialOffer = scrapedProduct.specialOffer
+                        });
+                    }
                 }
             }
             else
             {
-                _logger.CreateError($"vare ikke fundet på bog og ide's hjemmeside under varenummer: {product.ProductNumber}");
+                _logger.CreateError($"Noget gik galt under efterspørgslen af følgende varenumre: {string.Join(',', batch)}");
             }
-            Thread.Sleep(1000);
-            productNumberCount++;
+
+
         }
 
         Console.Write("\n");
         return [.. incorrectProducts.OrderBy(p => p.GrowthType).OrderBy(p => p.DifferentialPrice)];
     }
+
 
     internal async Task<Product?> GetProductFromAPI(AlstroemsProduct product)
     {
@@ -77,6 +94,32 @@ public class ProductRetreiver
         catch (Exception e)
         {
             _logger.CreateError(e.Message);
+            return null;
+        }
+    }
+
+    internal async Task<List<ProductV2>> GetProductFromScraperAPI(List<ProductPriceLookupRequestDto> productNumbers) {
+        try
+        {
+            HttpResponseMessage response = await client.PostAsync($"{baseUrl}api/prices/batch", JsonContent.Create(productNumbers));
+
+            
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.CreateError(
+                    $"Scraper API failed. Status: {(int)response.StatusCode} {response.StatusCode}. Body: {responseBody}"
+                );
+
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<List<ProductV2>>(responseBody)!;
+        }
+        catch (Exception e)
+        {
+            _logger.CreateError(e.ToString());
             return null;
         }
     }

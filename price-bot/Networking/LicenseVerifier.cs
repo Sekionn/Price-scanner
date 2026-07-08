@@ -1,4 +1,4 @@
-using price_bot.Logging;
+﻿using price_bot.Logging;
 using price_bot.Models;
 using System.Text.Json;
 
